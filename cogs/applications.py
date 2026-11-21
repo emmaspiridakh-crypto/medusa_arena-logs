@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import os
 
 import discord
 from discord import ui, app_commands
@@ -12,11 +13,17 @@ from utils import storage
 
 STORE_NAME = "criminal_applications"
 
+# Banner του panel: είτε URL στο config (APPLICATION_BANNER_URL),
+# είτε αρχείο assets/medusa_crim.png (ανεβαίνει μαζί με το μήνυμα).
+BANNER_FILENAME = "medusa_crim.png"
+BANNER_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", BANNER_FILENAME)
+
 # --- Emojis (μόνο εδώ) -------------------------------------------------------
 # Άλλαξε τα ID με τα δικά σου custom emojis όποτε θες.
 EMOJI_TITLE = "<:name:1573499489031946271>"
 EMOJI_INFO = "<:name:1573453240052486277>"
 EMOJI_APPLY = discord.PartialEmoji(name="name", id=1573499489031946271)
+EMOJI_PANEL_INFO = "<:name:1573467024846225560>"
 
 # Accept / Deny: τα βάζεις στο emojis.py, κατηγορία "applications" (κλειδιά "accept" και "deny")
 def _partial(text: str) -> discord.PartialEmoji | None:
@@ -30,6 +37,7 @@ EMOJI_DENY = _partial(EMOJI_DENY_TXT)
 
 # --- Χρώματα -----------------------------------------------------------------
 COLOR_PENDING = 0x7014E1
+COLOR_PANEL = 0xBB00FF
 COLOR_ACCEPTED = 0x57F287
 COLOR_DENIED = 0xED4245
 
@@ -69,7 +77,7 @@ def _save_data(message_id: int, data: dict) -> None:
 # =============================================================================
 
 def _apply_button() -> ui.Button:
-    btn = ui.Button(style=discord.ButtonStyle.secondary, label="〃 Apply",
+    btn = ui.Button(style=discord.ButtonStyle.secondary,
                     emoji=EMOJI_APPLY, custom_id=ID_APPLY)
 
     async def _cb(interaction: discord.Interaction):
@@ -79,28 +87,34 @@ def _apply_button() -> ui.Button:
     return btn
 
 
-def build_panel_view() -> ui.LayoutView:
-    text = ui.TextDisplay(
-        f"{EMOJI_INFO} Αν θες να αποκτήσεις ένα criminal team στον server μας, πάτα το κουμπί "
-        "**\"Apply\"** παρακάτω και απάντα σε μερικές ερωτήσεις σχετικά με το team σου. "
-        "__Παρακαλούμε απάντα ειλικρινά.__"
-    )
-    thumbnail_url = getattr(config, "APPLICATION_THUMBNAIL_URL", "")
-    intro = ui.Section(text, accessory=ui.Thumbnail(thumbnail_url)) if thumbnail_url else text
+def _banner_source() -> str | None:
+    """URL από το config, αλλιώς attachment αν υπάρχει το αρχείο."""
+    url = getattr(config, "APPLICATION_BANNER_URL", "")
+    if url:
+        return url
+    if os.path.exists(BANNER_PATH):
+        return f"attachment://{BANNER_FILENAME}"
+    return None
 
+
+def build_panel_view() -> ui.LayoutView:
+    items: list = [_sep()]
+    banner = _banner_source()
+    if banner:
+        items += [ui.MediaGallery(discord.MediaGalleryItem(banner)), _sep()]
+    items += [
+        ui.TextDisplay(f"## {EMOJI_TITLE} 〃 **__Medusa Arena - Criminal Application__**"),
+        _sep(),
+        ui.TextDisplay(
+            f"{EMOJI_PANEL_INFO} Απέκτησε το δικό σου criminal team με μονο 5 άτομα! "
+            "**Πάτα το κουμπί παρακάτω και απάντησε στις ερωτήσεις.**"
+        ),
+        _sep(),
+        ui.ActionRow(_apply_button()),
+        _sep(),
+    ]
     view = ui.LayoutView(timeout=None)
-    view.add_item(
-        ui.Container(
-            _sep(),
-            ui.TextDisplay(f"## {EMOJI_TITLE} 〃 **__Medusa Arena - Criminal Application__**"),
-            _sep(),
-            intro,
-            _sep(),
-            ui.ActionRow(_apply_button()),
-            _sep(),
-            accent_colour=COLOR_PENDING,
-        )
-    )
+    view.add_item(ui.Container(*items, accent_colour=COLOR_PANEL))
     return view
 
 
@@ -320,10 +334,13 @@ class Applications(commands.Cog):
     @app_commands.checks.has_role(config.OWNERSHIP_ROLE_ID)
     async def panel_criminal_application(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        await interaction.channel.send(view=build_panel_view())
+        banner_url = getattr(config, "APPLICATION_BANNER_URL", "")
+        use_file = not banner_url and os.path.exists(BANNER_PATH)
+        files = [discord.File(BANNER_PATH, filename=BANNER_FILENAME)] if use_file else []
+        await interaction.channel.send(view=build_panel_view(), files=files)
         note = "Στάλθηκε."
-        if not getattr(config, "APPLICATION_THUMBNAIL_URL", ""):
-            note += " (Χωρίς thumbnail: δεν έχει οριστεί το APPLICATION_THUMBNAIL_URL στο config.)"
+        if not banner_url and not use_file:
+            note += f" (Χωρίς banner: βάλε APPLICATION_BANNER_URL στο config ή το assets/{BANNER_FILENAME}.)"
         await interaction.followup.send(note, ephemeral=True)
 
 
