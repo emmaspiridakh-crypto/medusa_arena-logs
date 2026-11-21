@@ -66,7 +66,7 @@ class LoggingEvents(commands.Cog):
             return
 
         actor = await _audit_actor(after.guild, discord.AuditLogAction.member_role_update, after.id)
-        embed = _base_embed(after.guild, title=" Role Update")
+        embed = _base_embed(after.guild, title="Role Update")
         embed.add_field(name="Μέλος", value=f"{after.mention} (`{after.id}`)", inline=False)
         if added:
             embed.add_field(name="Προστέθηκαν", value=", ".join(r.mention for r in added), inline=False)
