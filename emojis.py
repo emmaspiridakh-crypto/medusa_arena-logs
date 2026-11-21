@@ -10,11 +10,6 @@ EMOJIS = {
         "untimeout": "<:untimeout:1548269753485762611>",
         "clear": "<:clear:1548269195844915201>",
     },
-    "staff_activity": {
-        "on_duty": "<a:on_duty:1548269590197575701>",
-        "off_duty": "<a:off_duty:1548269566659002479>",
-        "leaderboard": "<:leaderboard:1548270973285957662>",
-    },
     "applications": {
         "apply": "<:apply:1548269878438531184>",
     },
@@ -24,9 +19,6 @@ EMOJIS = {
     },
     "panel": {
         "scan": "<a:scan:1547992308492935209>",
-    },
-    "whitelist": {
-        "accept": "<:wl_accept:1548269957039525918>",
     },
 }
 
