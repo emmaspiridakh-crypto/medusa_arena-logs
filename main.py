@@ -21,7 +21,6 @@ bot = commands.Bot(command_prefix=config.PREFIX, intents=intents, help_command=N
 
 COGS = [
     "cogs.logging_events",
-    "cogs.temp_voice",
     "cogs.autorole",
     "cogs.server_status",
     "cogs.moderation",
