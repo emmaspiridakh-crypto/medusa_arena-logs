@@ -1,29 +1,32 @@
 from __future__ import annotations
 
 import datetime
-import os
 
 import discord
 from discord import ui, app_commands
 from discord.ext import commands
 
 import config
+from emojis import emoji
 from utils import storage
 
 STORE_NAME = "criminal_applications"
-
-LOGO_FILENAME = "medusa_logo.png"
-LOGO_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", LOGO_FILENAME)
 
 # --- Emojis (μόνο εδώ) -------------------------------------------------------
 # Άλλαξε τα ID με τα δικά σου custom emojis όποτε θες.
 EMOJI_TITLE = "<:name:1573499489031946271>"
 EMOJI_INFO = "<:name:1573453240052486277>"
 EMOJI_APPLY = discord.PartialEmoji(name="name", id=1573499489031946271)
-EMOJI_ACCEPT_TXT = "<:wl_accept:1548269957039525918>"
-EMOJI_ACCEPT = discord.PartialEmoji(name="wl_accept", id=1548269957039525918)
-EMOJI_DENY_TXT = "<:ban:>"
-EMOJI_DENY = discord.PartialEmoji(name="ban", id=1548269903780511785)
+
+# Accept / Deny: τα βάζεις στο emojis.py, κατηγορία "applications" (κλειδιά "accept" και "deny")
+def _partial(text: str) -> discord.PartialEmoji | None:
+    return discord.PartialEmoji.from_str(text) if text else None
+
+
+EMOJI_ACCEPT_TXT = emoji("applications", "accept")
+EMOJI_DENY_TXT = emoji("applications", "deny")
+EMOJI_ACCEPT = _partial(EMOJI_ACCEPT_TXT)
+EMOJI_DENY = _partial(EMOJI_DENY_TXT)
 
 # --- Χρώματα -----------------------------------------------------------------
 COLOR_PENDING = 0x7014E1
@@ -76,13 +79,14 @@ def _apply_button() -> ui.Button:
     return btn
 
 
-def build_panel_view(with_logo: bool) -> ui.LayoutView:
+def build_panel_view() -> ui.LayoutView:
     text = ui.TextDisplay(
         f"{EMOJI_INFO} Αν θες να αποκτήσεις ένα criminal team στον server μας, πάτα το κουμπί "
         "**\"Apply\"** παρακάτω και απάντα σε μερικές ερωτήσεις σχετικά με το team σου. "
         "__Παρακαλούμε απάντα ειλικρινά.__"
     )
-    intro = ui.Section(text, accessory=ui.Thumbnail(f"attachment://{LOGO_FILENAME}")) if with_logo else text
+    thumbnail_url = getattr(config, "APPLICATION_THUMBNAIL_URL", "")
+    intro = ui.Section(text, accessory=ui.Thumbnail(thumbnail_url)) if thumbnail_url else text
 
     view = ui.LayoutView(timeout=None)
     view.add_item(
@@ -316,10 +320,10 @@ class Applications(commands.Cog):
     @app_commands.checks.has_role(config.OWNERSHIP_ROLE_ID)
     async def panel_criminal_application(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        has_logo = os.path.exists(LOGO_PATH)
-        files = [discord.File(LOGO_PATH, filename=LOGO_FILENAME)] if has_logo else []
-        await interaction.channel.send(view=build_panel_view(has_logo), files=files)
-        note = "Στάλθηκε." if has_logo else f"Στάλθηκε χωρίς logo (δεν βρέθηκε το `assets/{LOGO_FILENAME}`)."
+        await interaction.channel.send(view=build_panel_view())
+        note = "Στάλθηκε."
+        if not getattr(config, "APPLICATION_THUMBNAIL_URL", ""):
+            note += " (Χωρίς thumbnail: δεν έχει οριστεί το APPLICATION_THUMBNAIL_URL στο config.)"
         await interaction.followup.send(note, ephemeral=True)
 
 
