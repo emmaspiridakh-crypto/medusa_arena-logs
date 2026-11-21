@@ -16,7 +16,7 @@ URL_RE = re.compile(
 )
 NAME_PARAM_RE = re.compile(r"[?&]name=(\w+)")
 
-MAX_EMOJIS_PER_COMMAND = 20
+MAX_EMOJIS_PER_COMMAND = 30
 
 OK = emoji("applications", "accept") or "✅"
 FAIL = emoji("applications", "deny") or "❌"
@@ -109,8 +109,6 @@ class OwnerTools(commands.Cog):
 
         if not found:
             await ctx.send(
-                "Γράψε `!adde` και βάλε απλά το emoji, ή κάνε reply σε μήνυμα που έχει το emoji "
-                "(ή reaction), ή γράψε το όνομά του αν είναι σε server που είναι το bot.",
                 delete_after=10,
             )
             return
@@ -119,7 +117,7 @@ class OwnerTools(commands.Cog):
         found = found[:MAX_EMOJIS_PER_COMMAND]
 
         lines: list[str] = []
-        timeout = aiohttp.ClientTimeout(total=20)
+        timeout = aiohttp.ClientTimeout(total=30)
         async with ctx.typing():
             async with aiohttp.ClientSession(timeout=timeout) as session:
                 for animated, name, eid in found:
@@ -133,7 +131,7 @@ class OwnerTools(commands.Cog):
                                 continue
                             image = await resp.read()
                     except (aiohttp.ClientError, asyncio.TimeoutError):
-                        lines.append(f"{FAIL} `{final_name}`: αποτυχία λήψης της εικόνας.")
+                        lines.append(f"{FAIL} `{final_name}`: αποτυχία")
                         continue
 
                     try:
@@ -147,7 +145,7 @@ class OwnerTools(commands.Cog):
                         lines.append(f"{FAIL} `{final_name}`: {e.text}")
 
         if skipped:
-            lines.append(f"Προσπεράστηκαν {skipped} emojis (όριο {MAX_EMOJIS_PER_COMMAND} ανά εντολή).")
+            lines.append(f"Παραπανω {skipped} emojis απο {MAX_EMOJIS_PER_COMMAND}.")
         await ctx.send("\n".join(lines), allowed_mentions=discord.AllowedMentions.none())
 
 
