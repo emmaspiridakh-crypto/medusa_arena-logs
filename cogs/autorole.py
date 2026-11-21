@@ -15,7 +15,7 @@ class AutoRole(commands.Cog):
         role = member.guild.get_role(config.AUTOROLE_ID)
         if role:
             try:
-                await member.add_roles(role, reason="Autorole - νέο μέλος")
+                await member.add_roles(role, reason="Autorole")
             except discord.Forbidden:
                 pass
 
