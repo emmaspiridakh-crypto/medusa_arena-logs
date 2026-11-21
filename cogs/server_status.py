@@ -5,7 +5,6 @@ import discord
 from discord.ext import commands, tasks
 
 import config
-from emojis import emoji
 
 _last_values: dict[str, str] = {}
 
@@ -66,7 +65,8 @@ class ServerStatus(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self._refresh_loop.start()
+        if not self._refresh_loop.is_running():
+            self._refresh_loop.start()
         for guild in self.bot.guilds:
             await self.update_stats(guild)
 
