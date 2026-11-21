@@ -108,7 +108,7 @@ class Moderation(commands.Cog):
         await ctx.message.delete()
         await ctx.send(text)
         await _send_log(ctx.guild, config.LOG_SAY_DMALL_CHANNEL_ID,
-                         _log_embed(ctx.guild, title="📢 Say", moderator=ctx.author,
+                         _log_embed(ctx.guild, title="Say", moderator=ctx.author,
                                     target=f"#{ctx.channel.name}", reason=text))
 
     @commands.command(name="say2")
@@ -120,7 +120,7 @@ class Moderation(commands.Cog):
             embed.set_thumbnail(url=ctx.guild.icon.url)
         await ctx.send(embed=embed)
         await _send_log(ctx.guild, config.LOG_SAY_DMALL_CHANNEL_ID,
-                         _log_embed(ctx.guild, title="📢 Say2", moderator=ctx.author,
+                         _log_embed(ctx.guild, title="Say2", moderator=ctx.author,
                                     target=f"#{ctx.channel.name}", reason=text))
 
     @commands.command(name="dmall")
@@ -179,7 +179,7 @@ class Moderation(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CheckFailure):
-            await ctx.send("Δεν έχεις δικαίωμα να χρησιμοποιήσεις την εντολή.", delete_after=5)
+            await ctx.send("Δεν έχεις δικαίωμα βλακα.", delete_after=5)
         elif isinstance(error, commands.MemberNotFound):
             await ctx.send("Δεν βρέθηκε ο μπρατ.", delete_after=5)
 
