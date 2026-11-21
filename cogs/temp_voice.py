@@ -29,7 +29,7 @@ class TempVoice(commands.Cog):
             if len(before.channel.members) == 0:
                 channel_id = before.channel.id
                 try:
-                    await before.channel.delete(reason="Temp voice channel άδειο")
+                    await before.channel.delete(reason="Temp voice channel empty")
                 except discord.NotFound:
                     pass
                 active_temp_channels.pop(channel_id, None)
