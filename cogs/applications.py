@@ -186,7 +186,7 @@ def build_review_view(data: dict) -> ui.LayoutView:
 
     items: list = [
         _sep(),
-        ui.TextDisplay(f"## {EMOJI_TITLE} 〃 **__Νέα Criminal Application__**"),
+        ui.TextDisplay(f"## {EMOJI_TITLE} 〃 **__Νέo Criminal Application__**"),
         _sep(),
         ui.TextDisplay(f"{EMOJI_INFO} **User:** <@{data['user_id']}> (`{data['user_id']}`)\n"
                        f"{EMOJI_INFO} **Ώρα:** <t:{ts}:F>"),
