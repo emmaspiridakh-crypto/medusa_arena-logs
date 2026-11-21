@@ -62,6 +62,17 @@ APPLICATION_CHANNEL_ID = 1573509865010364496
 # URL της εικόνας (banner) πάνω από το Criminal Application panel (προαιρετικό)
 APPLICATION_BANNER_URL = "https://i.imgur.com/WH4PGfq.png"
 
+# --- Staff Applications ---
+# Category όπου ανοίγουν τα private application channels
+STAFF_APP_CATEGORY_ID = 1573734506161119394
+# Κανάλι όπου στέλνονται οι ολοκληρωμένες αιτήσεις (Accept / Deny)
+STAFF_APP_REVIEW_CHANNEL_ID = 1569809100043190454
+# Ρόλοι που βλέπουν τα application channels (και μπορούν να κάνουν Close / Ping)
+STAFF_APP_VIEWER_ROLE_IDS = [OWNERSHIP_ROLE_ID]
+# Εικόνες του Staff Application panel (προαιρετικά)
+STAFF_APP_BANNER_URL = "https://i.imgur.com/KXvDJ8u.jpeg"
+STAFF_APP_LOGO_URL = "https://i.imgur.com/Lsd1YiZ.png"
+
 # --- Find (μόνο labels, χρειάζεται μόνο αυτά ο /find) ---
 APPLICATION_TYPES = {
     "criminal": {"label": "Criminal"},
