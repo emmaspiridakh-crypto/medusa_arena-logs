@@ -9,11 +9,19 @@ from discord.ext import commands
 from discord.ext import tasks
 
 import config
-from emojis import emoji
 from utils import storage
-from utils.components import build_base_container, add_separator, add_text, add_action_row
 
 STORE_NAME = "staff_activity"
+
+# --- Emojis (μόνο εδώ, όχι στο emojis.py) ---
+EMOJI_ON_DUTY = "<a:on_duty:1548269590197575701>"
+EMOJI_OFF_DUTY = "<a:off_duty:1548269566659002479>"
+EMOJI_LEADERBOARD = "<:leaderboard:1548270973285957662>"
+
+# --- Panel emojis ---
+PANEL_TITLE_EMOJI = "<a:name:1573488190977876179>"
+PANEL_INFO_EMOJI = "<:name:1573467024846225560>"
+PANEL_REFRESH_EMOJI = discord.PartialEmoji(name="name", id=1573490238955724840)
 
 active_sessions: dict[int, datetime.datetime] = {}
 
@@ -60,10 +68,10 @@ class StaffActivity(commands.Cog):
         now = datetime.datetime.now(datetime.timezone.utc)
         embed = discord.Embed(color=config.EMBED_COLOR, timestamp=now)
         if joined:
-            embed.title = f"{emoji('staff_activity', 'on_duty')} On Duty - Join"
+            embed.title = f"{EMOJI_ON_DUTY} On Duty - Join"
             embed.description = f"{member.mention} μπήκε on duty."
         else:
-            embed.title = f"{emoji('staff_activity', 'off_duty')} On Duty - Leave"
+            embed.title = f"{EMOJI_OFF_DUTY} On Duty - Leave"
             embed.description = f"{member.mention} βγήκε από on duty.\nΔιάρκεια: **{_fmt_duration(duration_seconds or 0)}**"
         embed.add_field(name="Ώρα", value=discord.utils.format_dt(now, style="F"))
         if guild.icon:
@@ -131,13 +139,12 @@ class StaffActivity(commands.Cog):
 
 
     def _make_refresh_button(self) -> ui.Button:
-        refresh_btn = ui.Button(label="Refresh", style=discord.ButtonStyle.secondary,
-                                 emoji="🔄", custom_id="staff_activity_refresh")
+        refresh_btn = ui.Button(label=" 〃 Refresh", style=discord.ButtonStyle.secondary,
+                                 emoji=PANEL_REFRESH_EMOJI, custom_id="staff_activity_refresh")
 
         async def _on_refresh(interaction: discord.Interaction):
             member = interaction.user
-            allowed_ids = {config.OWNERSHIP_ROLE_ID, config.MANAGER_ROLE_ID}
-            has_access = any(r.id in allowed_ids for r in getattr(member, "roles", []))
+            has_access = any(r.id == config.OWNERSHIP_ROLE_ID for r in getattr(member, "roles", []))
             if not has_access:
                 await interaction.response.send_message("Δεν έχεις δικαίωμα να κάνεις refresh.", ephemeral=True)
                 return
@@ -156,39 +163,34 @@ class StaffActivity(commands.Cog):
 
         ranking = sorted(totals.items(), key=lambda kv: kv[1], reverse=True)[:10]
         lines = []
-        for i, (uid, secs) in enumerate(ranking, start=1):
-            member = guild.get_member(int(uid))
+        for uid, secs in ranking:
+            member = guild.get_member(int(uid)) if guild else None
             name = member.mention if member else f"`{uid}`"
-            lines.append(f"**#{i}** {name} — {_fmt_duration(secs)}")
-        leaderboard_text = "\n".join(lines) if lines else "Δεν υπάρχουν δεδομένα ακόμα."
+            lines.append(f"{name} — {_fmt_duration(secs)}")
+        staff_text = "\n".join(lines) if lines else "Δεν υπάρχουν δεδομένα ακόμα."
 
-        on_duty_lines = []
-        for uid in active_sessions:
-            member = guild.get_member(uid)
-            if member:
-                on_duty_lines.append(f"{emoji('staff_activity', 'on_duty')} {member.mention}")
-        on_duty_text = "\n".join(on_duty_lines) if on_duty_lines else "Κανείς δεν είναι on duty αυτή τη στιγμή."
-
-        container = build_base_container(
-            title="Staff Activity",
-            description="Leaderboard χρόνου & live status. Μπες σε ένα από τα 2 On Duty κανάλια για να ξεκινήσει ο χρόνος σου. Αν είσαι manager μπες στο management.",
-            banner_url=config.STAFF_ACTIVITY_BANNER_URL,
-        )
-        add_separator(container)
-        add_text(container, f"**{emoji('staff_activity', 'leaderboard')} Leaderboard**\n{leaderboard_text}")
-        add_separator(container)
-        add_text(container, f"**Live Status**\n{on_duty_text}")
-        add_separator(container)
-        refresh_btn = self._make_refresh_button()
-        add_action_row(container, refresh_btn)
+        sep = lambda: ui.Separator(visible=True, spacing=discord.SeparatorSpacing.small)
 
         view = ui.LayoutView(timeout=None)
-        view.add_item(container)
+        view.add_item(
+            ui.Container(
+                sep(),
+                ui.TextDisplay(f"## {PANEL_TITLE_EMOJI} 〃 **__Medusa Arena - Staff Status__**"),
+                sep(),
+                ui.TextDisplay(f"{PANEL_INFO_EMOJI} ***Για να ξεκινήσει να μετράει ο χρόνος σου μπες σε ένα On Duty Channel. ***"),
+                sep(),
+                ui.TextDisplay(staff_text),
+                sep(),
+                ui.ActionRow(self._make_refresh_button()),
+                sep(),
+                accent_colour=0xA600FF,
+            )
+        )
         return view
 
 
     @app_commands.command(name="panel-staff-activity", description="Στέλνει το Staff Activity leaderboard panel")
-    @app_commands.checks.has_any_role(config.OWNERSHIP_ROLE_ID, config.MANAGER_ROLE_ID)
+    @app_commands.checks.has_role(config.OWNERSHIP_ROLE_ID)
     async def panel_staff_activity(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         view = self._build_panel_view(interaction.guild)
@@ -203,7 +205,7 @@ class StaffActivity(commands.Cog):
             storage.save(STORE_NAME, {})
             active_sessions.clear()
             await interaction.response.send_message(
-                f"{emoji('staff_activity', 'leaderboard')} Έγινε reset **όλο** το Staff Activity panel.",
+                f"{EMOJI_LEADERBOARD} Έγινε reset **όλο** το Staff Activity panel.",
                 ephemeral=True,
             )
         else:
@@ -212,7 +214,7 @@ class StaffActivity(commands.Cog):
             storage.save(STORE_NAME, store)
             active_sessions.pop(user.id, None)
             await interaction.response.send_message(
-                f"{emoji('staff_activity', 'leaderboard')} Έγινε reset ο χρόνος του {user.mention}.",
+                f"{EMOJI_LEADERBOARD} Έγινε reset ο χρόνος του {user.mention}.",
                 ephemeral=True,
             )
 
