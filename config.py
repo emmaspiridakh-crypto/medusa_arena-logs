@@ -55,6 +55,12 @@ ACTIVITY_CHANNELS_IDS = {
 ON_DUTY_ROLE_ID = 1569809099363852305
 STAFF_ACTIVITY_LOG_CHANNEL_ID = 1569809100416487629
 
+# --- Applications ---
+# Βάλε εδώ το ID του καναλιού που θα στέλνονται οι αιτήσεις (Accept / Deny)
+APPLICATION_CHANNEL_ID = 1573509865010364496
+# URL της εικόνας (thumbnail) του Criminal Application panel
+APPLICATION_THUMBNAIL_URL = "https://i.imgur.com/jOg0opN.jpeg"
+
 # --- Find (μόνο labels, χρειάζεται μόνο αυτά ο /find) ---
 APPLICATION_TYPES = {
     "criminal": {"label": "Criminal"},
