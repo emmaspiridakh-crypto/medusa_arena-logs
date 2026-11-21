@@ -39,7 +39,7 @@ class LoggingEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        embed = _base_embed(member.guild, title="📥 Member Join", color=0x57F287)
+        embed = _base_embed(member.guild, title="Member Join", color=0x57F287)
         embed.add_field(name="Μέλος", value=f"{member.mention} (`{member.id}`)", inline=False)
         embed.add_field(name="Account created", value=discord.utils.format_dt(member.created_at, style="R"), inline=False)
         embed.add_field(name="Ώρα", value=discord.utils.format_dt(datetime.datetime.now(datetime.timezone.utc), style="F"), inline=False)
@@ -48,7 +48,7 @@ class LoggingEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
-        embed = _base_embed(member.guild, title="📤 Member Leave", color=0xED4245)
+        embed = _base_embed(member.guild, title="Member Leave", color=0xED4245)
         embed.add_field(name="Μέλος", value=f"{member.mention} (`{member.id}`)", inline=False)
         roles = ", ".join(r.mention for r in member.roles if r.name != "@everyone") or "—"
         embed.add_field(name="Είχε ρόλους", value=roles, inline=False)
@@ -86,7 +86,7 @@ class LoggingEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
         actor = await _audit_actor(channel.guild, discord.AuditLogAction.channel_create, channel.id)
-        embed = _base_embed(channel.guild, title="➕ Channel Created", color=0x57F287)
+        embed = _base_embed(channel.guild, title="Channel Created", color=0x57F287)
         embed.add_field(name="Channel", value=f"{channel.mention if hasattr(channel, 'mention') else channel.name}", inline=False)
         embed.add_field(name="Από", value=actor.mention if actor else "Άγνωστο", inline=False)
         embed.add_field(name="Ώρα", value=discord.utils.format_dt(datetime.datetime.now(datetime.timezone.utc), style="F"), inline=False)
@@ -97,7 +97,7 @@ class LoggingEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
         actor = await _audit_actor(channel.guild, discord.AuditLogAction.channel_delete, channel.id)
-        embed = _base_embed(channel.guild, title="➖ Channel Deleted", color=0xED4245)
+        embed = _base_embed(channel.guild, title="Channel Deleted", color=0xED4245)
         embed.add_field(name="Channel", value=f"#{channel.name}", inline=False)
         embed.add_field(name="Από", value=actor.mention if actor else "Άγνωστο", inline=False)
         embed.add_field(name="Ώρα", value=discord.utils.format_dt(datetime.datetime.now(datetime.timezone.utc), style="F"), inline=False)
@@ -110,7 +110,7 @@ class LoggingEvents(commands.Cog):
         if before.name == after.name:
             return
         actor = await _audit_actor(after.guild, discord.AuditLogAction.channel_update, after.id)
-        embed = _base_embed(after.guild, title=" Channel Updated")
+        embed = _base_embed(after.guild, title="Channel Updated")
         embed.add_field(name="Πριν", value=before.name, inline=True)
         embed.add_field(name="Μετά", value=after.name, inline=True)
         embed.add_field(name="Από", value=actor.mention if actor else "Άγνωστο", inline=False)
