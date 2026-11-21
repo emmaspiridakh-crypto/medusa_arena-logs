@@ -23,7 +23,6 @@ COGS = [
     "cogs.logging_events",
     "cogs.temp_voice",
     "cogs.autorole",
-    "cogs.find",
     "cogs.server_status",
     "cogs.moderation",
     "cogs.staff_activity",
