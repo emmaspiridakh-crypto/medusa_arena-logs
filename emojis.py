@@ -19,6 +19,12 @@ EMOJIS = {
         "bell": "<:notif_bell:1573455807058542682>",
         "clock": "<:notif_clock:1573362872363385003>",
     },
+    "staff_applications": {
+        "start": "<:start:1573733508751433738>",  # βάλε εδώ το emoji, π.χ. "<:start:ID>"
+        "close": "<:close:1573455398344855643>",  # βάλε εδώ το emoji, π.χ. "<:close:ID>"
+        "ping": "<:ping:1573455807058542682>",   # βάλε εδώ το emoji, π.χ. "<:ping:ID>"
+        "send": "<:send:1573458107097423973>",   # βάλε εδώ το emoji, π.χ. "<:send:ID>"
+    },
     "panel": {
         "scan": "<:scan:1573362885181177926>",
     },
