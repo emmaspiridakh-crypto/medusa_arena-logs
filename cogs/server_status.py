@@ -12,10 +12,8 @@ _last_values: dict[str, str] = {}
 
 def _counts(guild: discord.Guild):
     members = sum(1 for m in guild.members if not m.bot)
-    online  = sum(1 for m in guild.members if not m.bot and m.status != discord.Status.offline)
-    bots    = sum(1 for m in guild.members if m.bot)
     boosts  = guild.premium_subscription_count or 0
-    return members, online, boosts, bots
+    return members, boosts
 
 
 class ServerStatus(commands.Cog):
@@ -25,13 +23,11 @@ class ServerStatus(commands.Cog):
 
 
     async def update_stats(self, guild: discord.Guild):
-        members, online, boosts, bots = _counts(guild)
+        members, boosts = _counts(guild)
 
         targets = {
             "members": (config.STATUS_MEMBERS_CHANNEL_ID, f"Members: {members}"),
-            "online":  (config.STATUS_ONLINE_CHANNEL_ID,  f"Online: {online}"),
             "boosts":  (config.STATUS_BOOSTS_CHANNEL_ID,  f"Boosts: {boosts}"),
-            "bots":    (config.STATUS_BOTS_CHANNEL_ID,    f"Bots: {bots}"),
         }
 
         for key, (channel_id, new_name) in targets.items():
