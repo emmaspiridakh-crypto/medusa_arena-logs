@@ -22,7 +22,7 @@ EMOJI_INFO = "<:name:1573453240052486277>"
 EMOJI_APPLY = discord.PartialEmoji(name="name", id=1573499489031946271)
 EMOJI_ACCEPT_TXT = "<:wl_accept:1548269957039525918>"
 EMOJI_ACCEPT = discord.PartialEmoji(name="wl_accept", id=1548269957039525918)
-EMOJI_DENY_TXT = "<:ban:1548269903780511785>"
+EMOJI_DENY_TXT = "<:ban:>"
 EMOJI_DENY = discord.PartialEmoji(name="ban", id=1548269903780511785)
 
 # --- Χρώματα -----------------------------------------------------------------
@@ -32,7 +32,7 @@ COLOR_DENIED = 0xED4245
 
 # --- Ερωτήσεις (key, label, placeholder, max_length) ---------------------------
 FIELDS = [
-    ("job", "Criminal Job Name & Type", "Όνομα Job & Τύπος [ Cartel / Mafia / Gang ]", 100),
+    ("job", "Criminal Team Name & Type", "Όνομα Team & Τύπος (Cartel / Mafia / Gang)", 100),
     ("members", "Πόσοι είστε;", "Γράψε τον αριθμό των μελών", 20),
     ("server", "Από ποιον server έρχεστε;", "Γράψε το όνομα του server", 100),
     ("activity", "Daily Activity In-Game (Member)", "Πόσες ώρες την ημέρα είστε in-game;", 100),
@@ -134,10 +134,10 @@ class ApplyModal(ui.Modal, title="Criminal Application"):
         _save_data(msg.id, data)
 
         await interaction.followup.send(
-            f"{EMOJI_ACCEPT_TXT} Η αίτησή σου στάλθηκε! Θα λάβεις απάντηση στα DMs σου.", ephemeral=True)
+            f"{EMOJI_ACCEPT_TXT} Η αίτησή σου στάλθηκε. Θα λάβεις απάντηση στα DMs σου, μην τα έχεις κλειστά.", ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception):
-        msg = "Κάτι πήγε στραβά με την αίτησή σου. Δοκίμασε ξανά."
+        msg = "Δοκίμασε ξανά."
         if interaction.response.is_done():
             await interaction.followup.send(msg, ephemeral=True)
         else:
@@ -170,7 +170,7 @@ def build_review_view(data: dict) -> ui.LayoutView:
         _sep(),
         ui.TextDisplay(f"## {EMOJI_TITLE} 〃 **__Νέα Criminal Application__**"),
         _sep(),
-        ui.TextDisplay(f"{EMOJI_INFO} **Αιτών:** <@{data['user_id']}> (`{data['user_id']}`)\n"
+        ui.TextDisplay(f"{EMOJI_INFO} **User:** <@{data['user_id']}> (`{data['user_id']}`)\n"
                        f"{EMOJI_INFO} **Ώρα:** <t:{ts}:F>"),
         _sep(),
         ui.TextDisplay("\n\n".join(answer_lines)),
@@ -191,7 +191,7 @@ def build_review_view(data: dict) -> ui.LayoutView:
                 text += f"\n{EMOJI_INFO} **Λόγος:** {data['reason']}"
             color = COLOR_DENIED
         if data.get("dm_failed"):
-            text += f"\n{EMOJI_INFO} Δεν μπόρεσα να στείλω DM στον χρήστη (κλειστά DMs)."
+            text += f"\n{EMOJI_INFO} κλειστά dms."
         items.append(ui.TextDisplay(text))
 
     items.append(_sep())
@@ -231,7 +231,7 @@ async def _finalize(interaction: discord.Interaction, message_id: int, *, accept
     """Καλείται αφού έχει γίνει defer(). Ενημερώνει αποθήκευση, DM και το μήνυμα."""
     data = _get_data(message_id)
     if not data or data.get("status") != "pending":
-        await interaction.followup.send("Αυτή η αίτηση έχει ήδη απαντηθεί.", ephemeral=True)
+        await interaction.followup.send("Eχει απαντηθεί.", ephemeral=True)
         return
 
     data["status"] = "accepted" if accepted else "denied"
@@ -251,14 +251,14 @@ async def _finalize(interaction: discord.Interaction, message_id: int, *, accept
 
 async def _on_accept(interaction: discord.Interaction):
     if not _is_owner(interaction.user):
-        await interaction.response.send_message("Μόνο το Ownership μπορεί να απαντήσει σε αιτήσεις.", ephemeral=True)
+        await interaction.response.send_message("Μόνο το Ownership μπορεί να απαντήσει.", ephemeral=True)
         return
     data = _get_data(interaction.message.id)
     if not data:
-        await interaction.response.send_message("Δεν βρέθηκε η αίτηση στη βάση.", ephemeral=True)
+        await interaction.response.send_message("Δεν βρέθηκε η αίτηση.", ephemeral=True)
         return
     if data.get("status") != "pending":
-        await interaction.response.send_message("Αυτή η αίτηση έχει ήδη απαντηθεί.", ephemeral=True)
+        await interaction.response.send_message("Αυτή η αίτηση έχει απαντηθεί.", ephemeral=True)
         return
     await interaction.response.defer()
     await _finalize(interaction, interaction.message.id, accepted=True, reason=None)
@@ -266,14 +266,14 @@ async def _on_accept(interaction: discord.Interaction):
 
 async def _on_deny(interaction: discord.Interaction):
     if not _is_owner(interaction.user):
-        await interaction.response.send_message("Μόνο το Ownership μπορεί να απαντήσει σε αιτήσεις.", ephemeral=True)
+        await interaction.response.send_message("Μόνο το Ownership μπορεί να απαντήσει.", ephemeral=True)
         return
     data = _get_data(interaction.message.id)
     if not data:
-        await interaction.response.send_message("Δεν βρέθηκε η αίτηση στη βάση.", ephemeral=True)
+        await interaction.response.send_message("Δεν βρέθηκε η αίτηση.", ephemeral=True)
         return
     if data.get("status") != "pending":
-        await interaction.response.send_message("Αυτή η αίτηση έχει ήδη απαντηθεί.", ephemeral=True)
+        await interaction.response.send_message("Αυτή η αίτηση έχει απαντηθεί.", ephemeral=True)
         return
     await interaction.response.send_modal(DenyModal(interaction.message.id))
 
@@ -288,7 +288,7 @@ class DenyModal(ui.Modal, title="Deny Application"):
 
     async def on_submit(self, interaction: discord.Interaction):
         if not _is_owner(interaction.user):
-            await interaction.response.send_message("Μόνο το Ownership μπορεί να απαντήσει σε αιτήσεις.", ephemeral=True)
+            await interaction.response.send_message("Μόνο το Ownership μπορεί να απαντήσει.", ephemeral=True)
             return
         await interaction.response.defer()
         reason = self.reason.value.strip() or None
@@ -312,7 +312,7 @@ class Applications(commands.Cog):
         review.add_item(ui.Container(_review_row(), accent_colour=COLOR_PENDING))
         self.bot.add_view(review)
 
-    @app_commands.command(name="panel-criminal-application", description="Στέλνει το Criminal Application panel")
+    @app_commands.command(name="panel-criminal-application")
     @app_commands.checks.has_role(config.OWNERSHIP_ROLE_ID)
     async def panel_criminal_application(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
