@@ -28,6 +28,7 @@ COGS = [
     "cogs.applications",
     "cogs.staff_activity",
     "cogs.owner_tools",
+    "cogs.staff_applications",
 ]
 
 
