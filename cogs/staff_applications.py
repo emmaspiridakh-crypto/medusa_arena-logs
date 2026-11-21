@@ -241,20 +241,20 @@ async def _on_apply(interaction: discord.Interaction):
 # =============================================================================
 
 def _start_button() -> ui.Button:
-    btn = ui.Button(style=discord.ButtonStyle.success, label="Start", emoji=EMOJI_START, custom_id=ID_START)
+    btn = ui.Button(style=discord.ButtonStyle.secondary, label="〃 Start", emoji=EMOJI_START, custom_id=ID_START)
     btn.callback = _on_start
     return btn
 
 
 def _close_button() -> ui.Button:
-    btn = ui.Button(style=discord.ButtonStyle.danger, label="Close Application",
+    btn = ui.Button(style=discord.ButtonStyle.secondary, label="〃 Close Application",
                     emoji=EMOJI_CLOSE, custom_id=ID_CLOSE)
     btn.callback = _on_close
     return btn
 
 
 def _ping_button() -> ui.Button:
-    btn = ui.Button(style=discord.ButtonStyle.secondary, label="Ping User",
+    btn = ui.Button(style=discord.ButtonStyle.secondary, label="〃 Ping User",
                     emoji=EMOJI_PING, custom_id=ID_PING)
     btn.callback = _on_ping
     return btn
@@ -297,7 +297,7 @@ def build_send_view() -> ui.LayoutView:
     view.add_item(
         ui.Container(
             _sep(),
-            ui.TextDisplay(f"{EMOJI_INFO} Απάντησες σε όλες τις ερωτήσεις! Πάτα **Send** για να σταλεί η αίτησή σου.\n"
+            ui.TextDisplay(f"{EMOJI_INFO} Απάντησες σε όλες τις ερωτήσεις. Πάτα **Send** για να σταλεί η αίτησή σου.\n"
                            f"-# {EMOJI_NOTE} Μόνο εσύ μπορείς να πατήσεις Send."),
             _sep(),
             ui.ActionRow(_send_button()),
@@ -337,7 +337,7 @@ async def _on_start(interaction: discord.Interaction):
                                                 ephemeral=True)
         return
     if data.get("started"):
-        await interaction.response.send_message("Το application έχει ήδη ξεκινήσει.", ephemeral=True)
+        await interaction.response.send_message("Το application έχει ξεκινήσει.", ephemeral=True)
         return
 
     await interaction.response.defer()
@@ -360,7 +360,7 @@ async def _on_send(interaction: discord.Interaction):
                                                 ephemeral=True)
         return
     if data.get("submitted"):
-        await interaction.response.send_message("Η αίτησή σου έχει ήδη σταλεί.", ephemeral=True)
+        await interaction.response.send_message("Η αίτησή σου έχει σταλεί.", ephemeral=True)
         return
     if not data.get("completed"):
         await interaction.response.send_message("Πρέπει πρώτα να απαντήσεις σε όλες τις ερωτήσεις.", ephemeral=True)
@@ -384,7 +384,7 @@ async def _on_close(interaction: discord.Interaction):
         await interaction.response.send_message("Δεν βρέθηκε αυτό το application.", ephemeral=True)
         return
     if interaction.user.id == data["user_id"]:
-        await interaction.response.send_message("Μόνο οι υπόλοιποι που βλέπουν το channel μπορούν να το κλείσουν.",
+        await interaction.response.send_message("Δεν μπορείς να το κλείσεις εσύ, πες το σε κάποιον άλλο.",
                                                 ephemeral=True)
         return
 
@@ -395,7 +395,7 @@ async def _on_close(interaction: discord.Interaction):
         allowed_mentions=discord.AllowedMentions.none())
     await asyncio.sleep(CLOSE_DELAY)
     try:
-        await channel.delete(reason=f"Staff application κλείστηκε από {interaction.user}")
+        await channel.delete(reason=f"Staff application εκλεισε από {interaction.user}")
     except discord.HTTPException:
         pass
 
@@ -406,12 +406,12 @@ async def _on_ping(interaction: discord.Interaction):
         await interaction.response.send_message("Δεν βρέθηκε αυτό το application.", ephemeral=True)
         return
     if interaction.user.id == data["user_id"]:
-        await interaction.response.send_message("Μόνο οι υπόλοιποι που βλέπουν το channel μπορούν να κάνουν ping.",
+        await interaction.response.send_message("Δεν μπορείς να κάνεις ping εσενα....",
                                                 ephemeral=True)
         return
 
     if data.get("submitted"):
-        await interaction.response.send_message("Το application έχει ήδη σταλεί.", ephemeral=True)
+        await interaction.response.send_message("Το application έχει σταλεί.", ephemeral=True)
         return
 
     channel = interaction.channel
@@ -450,7 +450,7 @@ async def _on_ping(interaction: discord.Interaction):
         # κλειστά DMs: ping μέσα στο channel
         await channel.send(f"<@{data['user_id']}> σε περιμένουμε να ολοκληρώσεις το application σου.",
                            allowed_mentions=discord.AllowedMentions(users=True))
-        await interaction.followup.send("Ο χρήστης έχει κλειστά DMs, του έκανα ping μέσα στο channel.",
+        await interaction.followup.send("Ο χρήστης έχει κλειστά DMs εγινε ping στο channel.",
                                         ephemeral=True)
 
 
@@ -496,7 +496,7 @@ def build_review_view(data: dict) -> ui.LayoutView:
 
     items: list = [
         _sep(),
-        ui.TextDisplay(f"## {EMOJI_TITLE} 〃 **__Νέα Staff Application__**"),
+        ui.TextDisplay(f"## {EMOJI_TITLE} 〃 **__Νέo Staff Application__**"),
         _sep(),
         ui.TextDisplay(f"{EMOJI_INFO} **User:** <@{data['user_id']}> (`{data['user_id']}`)\n"
                        f"{EMOJI_INFO} **Ώρα:** <t:{ts}:F>"),
