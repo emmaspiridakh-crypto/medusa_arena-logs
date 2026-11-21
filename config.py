@@ -59,7 +59,8 @@ STAFF_ACTIVITY_LOG_CHANNEL_ID = 1569809100416487629
 # Βάλε εδώ το ID του καναλιού που θα στέλνονται οι αιτήσεις (Accept / Deny)
 APPLICATION_CHANNEL_ID = 1573509865010364496
 # URL της εικόνας (thumbnail) του Criminal Application panel
-APPLICATION_THUMBNAIL_URL = "https://i.imgur.com/jOg0opN.jpeg"
+# URL της εικόνας (banner) πάνω από το Criminal Application panel (προαιρετικό)
+APPLICATION_BANNER_URL = "https://i.imgur.com/WH4PGfq.png"
 
 # --- Find (μόνο labels, χρειάζεται μόνο αυτά ο /find) ---
 APPLICATION_TYPES = {
