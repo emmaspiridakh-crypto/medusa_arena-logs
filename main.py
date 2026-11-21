@@ -25,6 +25,7 @@ COGS = [
     "cogs.autorole",
     "cogs.server_status",
     "cogs.moderation",
+    "cogs.applications",
     "cogs.staff_activity",
 ]
 
